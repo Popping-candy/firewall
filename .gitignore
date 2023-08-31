@@ -1,0 +1,8 @@
+*.o
+*.cmd
+*.mod.c
+.tmp_versions/
+modules.order
+Module.symvers
+Mkfile.old
+dkms.conf
