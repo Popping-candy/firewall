@@ -1,1 +1,0 @@
-cat /proc/devices | grep chardev

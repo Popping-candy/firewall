@@ -10,6 +10,19 @@
     },
     "files.associations": {
         "netfilter_ipv4.h": "c",
-        "version.h": "c"
+        "version.h": "c",
+        "netfilter.h": "c",
+        "kernel.h": "c",
+        "tcp.h": "c",
+        "fs.h": "c",
+        "kdev_t.h": "c",
+        "errno.h": "c",
+        "*.tcc": "cpp",
+        "fstream": "cpp",
+        "array": "c",
+        "initializer_list": "c",
+        "utility": "c",
+        "string": "c",
+        "stdio.h": "c"
     }
 }

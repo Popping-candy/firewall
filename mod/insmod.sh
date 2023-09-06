@@ -1,7 +1,6 @@
 # for test
-make clean
-make
 dmesg -C
-sudo insmod fw.ko
+rmmod fw
+insmod fw.ko
 lsmod | grep "fw"
 dmesg
