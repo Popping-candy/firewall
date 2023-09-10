@@ -19,14 +19,15 @@
 
 #include "firewall.h"
 /********************************netfilter*****************************************************/
-unsigned int hook_func(void *priv, struct sk_buff *skb, const struct nf_hook_state *state)
+unsigned int hook_local_out(void *priv, struct sk_buff *skb, const struct nf_hook_state *state)
 {
     struct iphdr *iph;
     struct tcphdr *tcph;
 
     iph = ip_hdr(skb);
     tcph = tcp_hdr(skb);
-    if (iph->protocol == IPPROTO_TCP && tcph->dest == htons(23))
+    //if (iph->protocol == IPPROTO_TCP && tcph->dest == htons(23))
+    if (iph->protocol == IPPROTO_TCP)
     {
         Packet my_pack;
         my_pack.src_ip = iph->saddr;            //无符号32位整数,大端字节序??
@@ -46,7 +47,8 @@ unsigned int hook_func(void *priv, struct sk_buff *skb, const struct nf_hook_sta
         return NF_ACCEPT;
 }
 /*
-五元组
+五元组 + syn ack fin  tcp??
+
 struct iphdr *ip = ip_hdr(skb);
 	pkg.src_ip = ntohl(ip->saddr);??  no  
 	pkg.dst_ip = ntohl(ip->daddr);
@@ -65,6 +67,14 @@ define    struct    memcpy   copy_to_user
 &my_pack
 memcpy(dst,src,size);
 */
+int firewall_init(void)
+{
+    return 0;
+}
+int check_rule(void)
+{
+    return 0;
+}
 /********************************chardev***********************************************************/
 static int chardev_open(struct inode *inode, struct file *file)
 {
@@ -112,6 +122,7 @@ static int __init mod_init(void)
     cdev_add(&cdev, devid, 255);                 //执行cdev_init函数，将cdev和file_operations关联起来
     printk(KERN_INFO "MAJOR Number is %d\n", MAJOR(devid));
     printk(KERN_INFO "MINOR Number is %d\n", MINOR(devid));
+    firewall_init();
     return 0;
 }
 
@@ -124,5 +135,3 @@ static void __exit mod_exit(void)
     unregister_chrdev_region(devid, 255);
 }
 /**************************************************************************************************/
-module_init(mod_init);
-module_exit(mod_exit);

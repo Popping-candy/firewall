@@ -4,6 +4,7 @@
         "**/*.o": true,
         "**/*.cmd":true,
         "**/.tmp_versions":true,
+        "**/*.mod":true,
         "**/*.mod.c":true,
         "**/*.order":true,
         "**/*.symvers":true

@@ -66,7 +66,12 @@ mknod /dev/chardev_test c 245 2
 ![demo](./assets/demo.png)
 
 ## target: 使用的数据结构
-todo
+
+ru
+
+s_ip d_ip s_port d_port pro 
+
+
 
 
 ## target:状态检测表
