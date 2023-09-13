@@ -11,8 +11,8 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include "util.h"
 #include "client.h"
+#include "util.h"
 int IPstr2IPint(const char *ipStr, unsigned int *ip, unsigned int *mask)
 {
     // init
@@ -93,74 +93,55 @@ int IPint2IPstr(unsigned int ip, unsigned int mask, char *ipStr)
     return 0;
 }
 
-int other()
+int the_other(char rbuffer[100])
 {
     int fd = open("/dev/chardev_test", O_RDWR);
     int fd_data = open("data", O_RDWR);
-    if ((fd == -1) || (fd_data == -1))
+    if (fd == -1)
     {
-        perror("open");
+        perror("open_dev");
+        return 0;
+    }
+    if (fd_data == -1)
+    {
+        perror("open_data");
         return 0;
     }
     printf("Packet size:%d\n", sizeof(Packet));
 
     read(fd, rbuffer, 100);
 
-    Packet my_pack;
+    Packet my_pack, sec_pack;
     mempcpy(&my_pack, rbuffer, sizeof(my_pack));
-    printf("\nhook a pack:\n");
-    printf("src_ip: %d.%d.%d.%d\n",
-           ((unsigned char *)&my_pack.src_ip)[0],
-           ((unsigned char *)&my_pack.src_ip)[1],
-           ((unsigned char *)&my_pack.src_ip)[2],
-           ((unsigned char *)&my_pack.src_ip)[3]);
-    printf("dst_ip: %d.%d.%d.%d\n",
-           ((unsigned char *)&my_pack.dst_ip)[0],
-           ((unsigned char *)&my_pack.dst_ip)[1],
-           ((unsigned char *)&my_pack.dst_ip)[2],
-           ((unsigned char *)&my_pack.dst_ip)[3]);
-    printf("src_port:   %d\n", my_pack.src_port);
-    printf("dst_port:   %d\n", my_pack.dst_port);
-    printf("protocol:   %d\n", my_pack.protocol);
+    mempcpy(&sec_pack, rbuffer + sizeof(my_pack), sizeof(my_pack));
+    print_pack(my_pack);
+    print_pack(sec_pack);
 
     close(fd);
     write(fd_data, rbuffer, 100);
     close(fd_data);
     return 0;
 }
+int print_pack(Packet my_pack)
+{
+    printf("\nhook a pack:\n");
+    printf("src_ip: %d.%d.%d.%d\n", IP_DEC(my_pack.src_ip));
+    printf("dst_ip: %d.%d.%d.%d\n", IP_DEC(my_pack.dst_ip));
+    printf("src_port:   %d\n", my_pack.src_port);
+    printf("dst_port:   %d\n", my_pack.dst_port);
+    printf("protocol:   %d\n", my_pack.protocol);
+}
 
-int menu()
+int print_menu()
 {
     system("clear");
-    printf("Firewall user application.\n\
-choose:\n\
-1. rule\n\
-2. defallt action\n\
-3. connection\n\
-4. log\n\
-5. net\n");
-    int cmd;
-    scanf("%d", &cmd);
-    switch (cmd)
-    {
-    case 1:
-        printf("rule");
-        break;
-    case 2:
-        printf("defallt action");
-        break;
-    case 3:
-        printf("connection");
-        break;
-    case 4:
-        printf("log");
-        break;
-    case 5:
-        printf("net");
-        break;
-    default:
-        printf("error");
-        break;
-    }
+    printf("Firewall user application.\n"
+           "请选择:\n"
+           "1. rule\n"
+           "2. default action\n"
+           "3. connection\n"
+           "4. log\n"
+           "5. net\n"
+           "6. out\n");
     return 0;
 }

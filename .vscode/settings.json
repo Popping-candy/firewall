@@ -24,6 +24,7 @@
         "initializer_list": "c",
         "utility": "c",
         "string": "c",
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "cstdint": "cpp"
     }
 }

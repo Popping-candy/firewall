@@ -1,21 +1,17 @@
 CC=g++
-CFLAGS=-Wall
-
-BIN_DIR=.
-
-.PHONY: all clean
+CFLAGS = -std=c++11
 
 all: client
 
-client.o: client.cpp
-	$(CC) $(CFLAGS) -c $< -o $@
-
-util.o: util.cpp
-	$(CC) $(CFLAGS) -c $< -o $@
-
 client: client.o util.o
-	$(CC) $(CFLAGS) $< -o $(BIN_DIR)/$@
-	rm -f clirnt.o util.o
+	$(CC) $(CFLAGS) -o client client.o util.o
+		rm -f *.o
+
+client.o: client.cpp client.h
+	$(CC) $(CFLAGS) -c client.cpp
+
+util.o: util.cpp util.h
+	$(CC) $(CFLAGS) -c util.cpp
 
 clean:
-	rm -f $(BIN_DIR)/client
+	rm -f *.o client

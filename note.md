@@ -65,23 +65,59 @@ mknod /dev/chardev_test c 245 2
 
 ![demo](./assets/demo.png)
 
-## target: 使用的数据结构
+## target: 数据
 
-ru
+### 日志
 
-s_ip d_ip s_port d_port pro 
-
-
-
+子线程 每分钟从内核读取
+内核大数组  overflow循环
+日志库？？
+```c
+typedef struct
+{
+    uint32_t src_ip;
+    uint32_t dst_ip;
+    uint16_t src_port;
+    uint16_t dst_port;
+    uint8_t protocol;
+    bool action;
+    bool is_log
+} Rule;
+typedef struct
+{
+    time;
+    uint32_t src_ip;
+    uint32_t dst_ip;
+    uint16_t src_port;
+    uint16_t dst_port;
+    uint8_t protocol;
+}Log
+```
+LOG:
+[time]...
 
 ## target:状态检测表
+
 todo
 
 ## other
 
+```shell
+dmesg -C
+rmmod fw
+insmod fw.ko
+lsmod | grep "fw"
+dmesg
+mknod /dev/chardev_test c 245 2
+cat /proc/devices
+```
+
 close’ was not declared in this scope??
 内核中不能使用C库提供的函数??
 权限
+
+
+
 
 system(command)
 
