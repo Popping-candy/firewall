@@ -15,6 +15,10 @@
 #include "linux/kdev_t.h"
 #include "firewall.h"
 #include "tool.h"
+#include "struct.h"
+
+Rule rule_table[RULE_MAX];
+Log log_table[LOG_MAX];
 /********************************netfilter*****************************************************/
 unsigned int hook_local_out(void *priv, struct sk_buff *skb, const struct nf_hook_state *state)
 {
@@ -128,4 +132,4 @@ MODULE_LICENSE("GPL");             // 描述模块的许可证
 MODULE_AUTHOR("wyt");              // 描述模块的作者
 MODULE_DESCRIPTION("module test"); // 描述模块的介绍信息
 MODULE_ALIAS("alias xxx");         // 描述模块的别名信息
-/**************************************************************************************************/
+                                   /**************************************************************************************************/

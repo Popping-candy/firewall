@@ -14,36 +14,7 @@ static void __exit mod_exit(void);
 int check_rule(void);
 int firewall_init(void);
 
-typedef struct
-{
-    uint32_t src_ip;
-    uint32_t dst_ip;
-    uint16_t src_port;
-    uint16_t dst_port;
-    uint8_t protocol;
-} Packet;
-typedef struct
-{
-    uint32_t src_ip;
-    uint32_t dst_ip;
-    uint16_t src_port;
-    uint16_t dst_port;
-    uint8_t protocol;
-    bool action;
-} Rule;
-typedef struct
-{
-    uint32_t src_ip;
-    uint32_t dst_ip;
-    uint16_t src_port;
-    uint16_t dst_port;
-    uint8_t protocol;
-    bool action;
-} Log;
-
 dev_t devid; //函数向内核申请下来的设备号
-Rule rule_table[RULE_MAX];
-Log log_table[LOG_MAX];
 char char_buffer[100];
 char pck_buffer[100];
 int pack_num = 0;
@@ -60,5 +31,4 @@ static struct nf_hook_ops nfho = {
     .hooknum = NF_INET_LOCAL_IN, // hook注册点
     .priority = NF_IP_PRI_FIRST  // 优先级
 };
-
 #endif
