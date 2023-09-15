@@ -2,8 +2,6 @@
 #define _FIREWALL_H
 #define MYMAJOR 200           //chardev
 #define MYNAME "chardev_test" //执行 cat /proc/devices显示的名称
-#define RULE_MAX 100
-#define LOG_MAX 1000
 
 unsigned int hook_local_out(void *priv, struct sk_buff *skb, const struct nf_hook_state *state); //netfilter
 static ssize_t chardev_open(struct inode *inode, struct file *file);

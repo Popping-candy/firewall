@@ -7,21 +7,22 @@
 #include <linux/tcp.h>
 
 #include "tool.h"
-#include "struct.h"
+#include "my_struct.h"
+extern Log log_table[LOG_MAX];
 int log(struct sk_buff *skb)
 {
     struct timeval tv;
     struct tm t;
     struct iphdr *iph;
     struct tcphdr *tcph;
-    Log my_log;
+    int i = 1;
     iph = ip_hdr(skb);
     tcph = tcp_hdr(skb);
-    my_log.src_ip = iph->saddr; //无符号32位整数,大端字节序??
-    my_log.dst_ip = iph->daddr;
-    my_log.src_port = ntohs(tcph->source); //无符号16位整数
-    my_log.dst_port = ntohs(tcph->dest);
-    my_log.protocol = iph->protocol; //无符号8位整数,TCP（6）、UDP（17）、ICMP（1）
+    log_table[i].src_ip = iph->saddr; //无符号32位整数,大端字节序??
+    log_table[i].dst_ip = iph->daddr;
+    log_table[i].src_port = ntohs(tcph->source); //无符号16位整数
+    log_table[i].dst_port = ntohs(tcph->dest);
+    log_table[i].protocol = iph->protocol; //无符号8位整数,TCP（6）、UDP（17）、ICMP（1）
 
     do_gettimeofday(&tv);
     tv.tv_sec += 8 * 3600;

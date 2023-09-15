@@ -1,6 +1,7 @@
 #ifndef _STRUCT_H
 #define _STRUCT_H
-
+#define RULE_MAX 100
+#define LOG_MAX 1000
 typedef struct
 {
     uint32_t src_ip;
@@ -27,7 +28,7 @@ typedef struct
     uint16_t src_port;
     uint16_t dst_port;
     uint8_t protocol;
-    bool action;
+    struct tm t;
 } Log;
 
 #endif

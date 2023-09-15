@@ -108,6 +108,7 @@ rmmod fw
 insmod fw.ko
 lsmod | grep "fw"
 dmesg
+ls /dev | grep char
 mknod /dev/chardev_test c 245 2
 cat /proc/devices
 ```

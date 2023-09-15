@@ -13,11 +13,12 @@
 #include "linux/errno.h"
 #include "linux/uaccess.h"
 #include "linux/kdev_t.h"
+#include <linux/time.h>
 #include "firewall.h"
 #include "tool.h"
-#include "struct.h"
+#include "my_struct.h"
 
-Rule rule_table[RULE_MAX];
+Rule rule_table[RULE_MAX];//lock??
 Log log_table[LOG_MAX];
 /********************************netfilter*****************************************************/
 unsigned int hook_local_out(void *priv, struct sk_buff *skb, const struct nf_hook_state *state)
