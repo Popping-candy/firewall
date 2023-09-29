@@ -24,6 +24,7 @@ typedef struct
 } Rule;
 typedef struct
 {
+    struct tm t;
     uint32_t src_ip;
     uint32_t dst_ip;
     uint16_t src_port;

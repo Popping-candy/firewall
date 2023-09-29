@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fstream>
+#include <sstream>
 
 #include <stdint.h>
 #include <getopt.h>
@@ -13,6 +15,21 @@
 #include <unistd.h>
 #include "client.h"
 #include "util.h"
+uint32_t IPstr2IPint(const std::string &ip)//big
+{
+    std::stringstream ss(ip);
+    std::string segment;
+    uint32_t ipInt = 0;
+    int shift = 24; // Start from the leftmost byte.
+
+    while (std::getline(ss, segment, '.'))
+    {
+        ipInt |= (stoi(segment) & 0xFF) << shift;
+        shift -= 8; // Move to the next byte.
+    }
+
+    return ipInt;
+}
 int IPstr2IPint(const char *ipStr, unsigned int *ip, unsigned int *mask)
 {
     // init
@@ -96,13 +113,13 @@ int IPint2IPstr(unsigned int ip, unsigned int mask, char *ipStr)
 int the_other(char rbuffer[100])
 {
     int fd = open("/dev/chardev_test", O_RDWR);
-    int fd_data = open("data", O_RDWR);
+    int fd_log = open("./log.txt", O_RDWR);
     if (fd == -1)
     {
         perror("open_dev");
         return 0;
     }
-    if (fd_data == -1)
+    if (fd_log == -1)
     {
         perror("open_data");
         return 0;
@@ -118,8 +135,7 @@ int the_other(char rbuffer[100])
     print_pack(sec_pack);
 
     close(fd);
-    write(fd_data, rbuffer, 100);
-    close(fd_data);
+    close(fd_log);
     return 0;
 }
 int print_pack(Packet my_pack)
@@ -145,3 +161,49 @@ int print_menu()
            "6. out\n");
     return 0;
 }
+
+int rule_init()
+{
+    //std::ofstream outFile("test.txt");
+    //std::ifstream inFile("test.txt");
+
+    std::ifstream fd_rule("data/rule.txt");
+    std::string line;
+    std::vector<Rule> Rule_table;
+    if (fd_rule.is_open())
+    {
+        while (getline(fd_rule, line))
+        {
+            std::stringstream ss(line);
+            Rule ft;
+            std::string srcIP, destIP;
+
+            ss >> srcIP >> destIP >> ft.src_port >> ft.dst_port >> ft.protocol >> ft.action;
+            ft.src_ip = IPstr2IPint(srcIP);//1.2.3.4
+            ft.dst_ip = IPstr2IPint(destIP);
+            Rule_table.push_back(ft);
+
+            printf("src_ip: %d.%d.%d.%d\n", IP_DEC(ft.src_ip));//4.3.2.1
+            printf("dst_ip: %d.%d.%d.%d\n", IP_DEC(ft.dst_ip));
+
+            std::cout << "srcIP: " << srcIP << " ";
+            std::cout << "destIP: " << destIP << " ";
+            std::cout << "srcPort: " << ft.src_port << " ";
+            std::cout << "destPort: " << ft.dst_port << " ";
+            std::cout << "destPort: " << ft.protocol << " ";
+            std::cout << "protocol: " << ft.action << std::endl;
+        }
+
+        fd_rule.close();
+    }
+    return 0;
+}
+/*
+    std::ofstream fd_rule("data/rule.txt");
+    if (fd_rule.is_open())
+    {
+        fd_rule << "Hello, World!\n";
+        fd_rule << "This is a test.\n";
+        fd_rule.close();
+    }
+    */

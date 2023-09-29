@@ -23,6 +23,8 @@ NF_REPEAT
 **sk_buff**
 skb指针指向sk_buff数据结构，网络堆栈用sk_buff数据结构来描述数据包。这个数据结构在linux/skbuff.h中定义。sk_buff数据结构中最有用的部分就是那三个描述传输层包头、网络层包头以及链路层包头的联合(union)了。这三个联合的名字分别是h、nh以及mac
 
+[ip tcp ..结构体](https://www.cnblogs.com/songshuaiStudy/p/11496065.html)
+
 ```c
 //define    struct    memcpy   copy_to_user	五元组
 struct iphdr *ip = ip_hdr(skb);

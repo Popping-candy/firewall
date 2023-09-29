@@ -17,7 +17,10 @@
 #include "firewall.h"
 #include "tool.h"
 #include "my_struct.h"
-
+#define IP_DEC(addr) ((unsigned char *)&addr)[0], \
+                     ((unsigned char *)&addr)[1], \
+                     ((unsigned char *)&addr)[2], \
+                     ((unsigned char *)&addr)[3]
 Rule rule_table[RULE_MAX];//lock??
 Log log_table[LOG_MAX];
 /********************************netfilter*****************************************************/
@@ -37,6 +40,9 @@ unsigned int hook_local_out(void *priv, struct sk_buff *skb, const struct nf_hoo
         my_pack.src_port = ntohs(tcph->source); //无符号16位整数
         my_pack.dst_port = ntohs(tcph->dest);
         my_pack.protocol = iph->protocol; //无符号8位整数,TCP（6）、UDP（17）、ICMP（1）
+        //tcph->
+        printk("src_ip:%u.%u.%u.%u,,dst_ip:%u.%u.%u.%u\n",IP_DEC(my_pack.src_ip),IP_DEC(my_pack.dst_ip));
+        printk("size_of_tcph:%d||syn:%d\n",sizeof(struct tcphdr),tcph->syn);
         if (pack_num < 4)
         {
             memcpy(pck_buffer + pack_num * sizeof(Packet), &my_pack, sizeof(Packet));
@@ -50,7 +56,7 @@ unsigned int hook_local_out(void *priv, struct sk_buff *skb, const struct nf_hoo
         check_rule();
         log(skb);
         printk(KERN_INFO "Dropping telnet packet\n");
-        return NF_DROP;
+        return NF_ACCEPT;
     }
     else
         return NF_ACCEPT;

@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fstream>
+#include <sstream>
 #include <time.h>
 #include <stdint.h>
 #include <getopt.h>
@@ -16,7 +18,7 @@
 #include "util.h"
 
 using namespace std;
-
+//Little??
 int log()
 {
     time_t currentTime;
@@ -44,6 +46,7 @@ int main(int argc, char *argv[])
         {
         case 1:
             printf("rule");
+            rule_init();
             break;
         case 2:
             printf("defallt action");
