@@ -17,36 +17,28 @@
 #include "client.h"
 #include "util.h"
 
-using namespace std;
-//Little??
-int log()
-{
-    time_t currentTime;
-    struct tm *localTime;
-    char timeString[100];
-    currentTime = time(NULL);
-    localTime = localtime(&currentTime);
-    strftime(timeString, sizeof(timeString), "%Y-%m-%d %H:%M:%S", localTime);
-    printf("当前时间：%s\n", timeString);
-    return 0;
-}
-
 int main(int argc, char *argv[])
 {
+    //init
     char wbuffer[100];
     char rbuffer[100];
+    std::vector<Rule> RuleTable;
+    readRulesFromFile(RuleTable);
     //main loop
     print_menu();
+    //read from rule.txt
     int cmd;
+    std::string main_cmd;
     bool out = 1;
     while (out)
     {
         scanf("%d", &cmd);
+        getchar();
         switch (cmd)
         {
         case 1:
-            printf("rule");
-            rule_init();
+            printf("rule\n");
+            ruleCommand(RuleTable);
             break;
         case 2:
             printf("defallt action");
@@ -56,7 +48,6 @@ int main(int argc, char *argv[])
             break;
         case 4:
             system("clear");
-            log();
             the_other(rbuffer);
             break;
         case 5:
@@ -70,7 +61,6 @@ int main(int argc, char *argv[])
             printf("error");
             break;
         }
-        getchar();
         getchar();
         print_menu();
     }

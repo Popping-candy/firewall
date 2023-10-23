@@ -15,3 +15,6 @@ util.o: util.cpp util.h
 
 clean:
 	rm -f *.o client
+
+
+#-std=c++11

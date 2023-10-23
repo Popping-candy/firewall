@@ -21,7 +21,8 @@
                      ((unsigned char *)&addr)[1], \
                      ((unsigned char *)&addr)[2], \
                      ((unsigned char *)&addr)[3]
-Rule rule_table[RULE_MAX];//lock??
+Rule RuleTable[RULE_MAX]; //lock??
+int RuleTable_size = 0;
 Log log_table[LOG_MAX];
 /********************************netfilter*****************************************************/
 unsigned int hook_local_out(void *priv, struct sk_buff *skb, const struct nf_hook_state *state)
@@ -41,8 +42,8 @@ unsigned int hook_local_out(void *priv, struct sk_buff *skb, const struct nf_hoo
         my_pack.dst_port = ntohs(tcph->dest);
         my_pack.protocol = iph->protocol; //无符号8位整数,TCP（6）、UDP（17）、ICMP（1）
         //tcph->
-        printk("src_ip:%u.%u.%u.%u,,dst_ip:%u.%u.%u.%u\n",IP_DEC(my_pack.src_ip),IP_DEC(my_pack.dst_ip));
-        printk("size_of_tcph:%d||syn:%d\n",sizeof(struct tcphdr),tcph->syn);
+        printk("src_ip:%u.%u.%u.%u,,dst_ip:%u.%u.%u.%u\n", IP_DEC(my_pack.src_ip), IP_DEC(my_pack.dst_ip));
+        printk("size_of_tcph:%d||syn:%d\n", sizeof(struct tcphdr), tcph->syn);
         if (pack_num < 4)
         {
             memcpy(pck_buffer + pack_num * sizeof(Packet), &my_pack, sizeof(Packet));
@@ -68,7 +69,6 @@ memcpy(dst,src,size);
 */
 int firewall_init(void)
 {
-    //tongbu rule
     printk("my firewall module loaded.\n");
     printk("MAJOR Number is %d\n", MAJOR(devid));
     printk("MINOR Number is %d\n", MINOR(devid));
@@ -79,6 +79,7 @@ int check_rule(void)
     return 0;
 }
 /********************************chardev***********************************************************/
+/* 字符设备驱动,先写再读 */
 static ssize_t chardev_open(struct inode *inode, struct file *file)
 {
     printk(KERN_INFO "chardev open\n");
@@ -88,28 +89,114 @@ static ssize_t chardev_open(struct inode *inode, struct file *file)
 static ssize_t chardev_read(struct file *file, char __user *buf, size_t size, loff_t *ppos)
 {
     printk(KERN_INFO "chardev read\n");
-    if (size > 100)
+    int ret = 0; //???
+    if (op_flag == OP_GET_NAT)
     {
-        size = 100;
+        ret = RuleTable_size * sizeof(Rule);
+        if (ret > size)
+        {
+            printk("rule: Read Overflow\n");
+            return size;
+        }
+        copy_to_user(buf, databuf, ret);
+        printk("rule: Read %d bytes\n", ret);
     }
-    if (copy_to_user(buf, pck_buffer, size))
-    {
-        return -EFAULT;
-    }
-    return size;
+    return ret;
+    /*
+	int ret = 0;
+
+	// 获取连接表
+	if (op_flag == OP_GET_CONNECT) {
+		// 等待开锁
+		while (hashLock)
+			;
+		// 上锁
+		hashLock = 1;
+		
+		// 返回值大小 = 连接数 * Connection大小
+		ret = connection_num * (sizeof(Connection) - 4);
+		if (ret > size) {
+			printk("Connection: Read Overflow\n");
+			return size;
+		}
+
+		Connection *p = conHead.next;
+		int d, i=0;
+		while (p != &conEnd) {
+			d = p->src_ip;
+			memcpy(&databuf[i * (sizeof(Connection) - 4)], &d, sizeof(unsigned));
+			d = p->dst_ip;
+			memcpy(&databuf[i * (sizeof(Connection) - 4) + 4], &d, sizeof(unsigned));
+			d = p->src_port;
+			memcpy(&databuf[i * (sizeof(Connection) - 4) + 8], &d, sizeof(int));
+			d = p->dst_port;
+			memcpy(&databuf[i * (sizeof(Connection) - 4) + 12], &d, sizeof(int));
+			d = p->protocol;
+			memcpy(&databuf[i * (sizeof(Connection) - 4) + 16], &d, sizeof(int));
+			d = (int)hashTable[p->index];
+			memcpy(&databuf[i * (sizeof(Connection) - 4) + 20], &d, sizeof(unsigned));
+
+			p = p->next;
+			i++;
+		}
+
+		// 开锁
+		hashLock = 0;
+		copy_to_user(buf, databuf, ret);
+		printk("Connection: Read %d bytes\n", ret);
+	}
+	// 获取日志表
+	else if (op_flag == OP_GET_LOG) {
+		ret = log_num * sizeof(Log);
+		if (ret > size) {
+			printk("Log: Read Overflow\n");
+			return size;
+		}
+
+		memcpy(databuf, logs, ret);
+		copy_to_user(buf, databuf, ret);
+		printk("Log: Read %d bytes\n", ret);
+	}
+	// TODO:获取NAT表
+
+	return ret;    
+    */
 }
 static ssize_t chardev_write(struct file *file, const char __user *buf, size_t size, loff_t *offt)
 {
-    printk(KERN_INFO "chardev write\n");
-    if (size > 100)
+    if (size > 20480)
     {
-        size = 100;
+        printk("Write Overflow\n");
+        return 20480;
     }
-    if (copy_from_user(char_buffer, buf, size))
+
+    copy_from_user(databuf, buf, size);
+    //先读入操作符
+    int opt = 0x03 & databuf[size - 1];
+
+    if (opt == OP_WRITE_RULE)
+    { //***
+        op_flag = 0;
+        RuleTable_size = (size - 1) / sizeof(Rule);
+        printk("Get %d rules\n", RuleTable_size);
+        memcpy(RuleTable, databuf + 1, size - 1);
+    }
+    else if (opt == OP_GET_CONNECT)
     {
-        return -EFAULT;
+        op_flag = OP_GET_CONNECT;
+        printk("Write Connections\n");
     }
-    printk("write %s\n", char_buffer);
+    else if (opt == OP_GET_LOG)
+    {
+        op_flag = OP_GET_LOG;
+        printk("Write Log\n");
+    }
+    else if (opt == OP_GET_NAT)
+    {
+        op_flag = OP_GET_NAT;
+        printk("Write NAT\n");
+    }
+
     return size;
 }
 /**************************************************************************************************/
