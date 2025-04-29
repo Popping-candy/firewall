@@ -57,6 +57,19 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp"
-    }
+        "typeinfo": "cpp",
+        "time.h": "c",
+        "my_struct.h": "c",
+        "ip.h": "c",
+        "icmp.h": "c",
+        "types.h": "c",
+        "tcp_hook.h": "c",
+        "udp.h": "c",
+        "crc16.h": "c",
+        "skbuff.h": "c",
+        "in.h": "c",
+        "module.h": "c",
+        "semaphore.h": "c"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
 }
